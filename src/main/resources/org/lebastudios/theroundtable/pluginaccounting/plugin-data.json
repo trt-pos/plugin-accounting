@@ -1,0 +1,18 @@
+{
+  "pluginName": "Accounting",
+  "pluginId": "plugin-accounting",
+  "pluginDescription": "Accounting plugin for The Round Table. Track your income and expenses, manage your finances, and generate reports.",
+  "pluginVersion": "3.0.0",
+  "pluginVendor": "Leba Studios - Software Solutions",
+  "pluginVendorUrl": "https://lebastudios.org",
+  "pluginDependencies": [
+    {
+      "pluginId": "desktop-app",
+      "pluginVersion": "3.0.0"
+    },
+    {
+      "pluginId": "plugin-cash-register",
+      "pluginVersion": "3.0.0"
+    }
+  ]
+}
