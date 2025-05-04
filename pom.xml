@@ -44,7 +44,7 @@
         <dependency>
             <groupId>com.github.trt-pos</groupId>
             <artifactId>fxml2java</artifactId>
-            <version>v0.2.2</version>
+            <version>v0.3.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -62,7 +62,7 @@
                         <path>
                             <groupId>com.github.trt-pos</groupId>
                             <artifactId>fxml2java</artifactId>
-                            <version>v0.2.2</version>
+                            <version>v0.3.0</version>
                         </path>
                         <path>
                             <groupId>org.lebastudios.theroundtable</groupId>
