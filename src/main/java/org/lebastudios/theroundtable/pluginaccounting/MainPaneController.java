@@ -4,8 +4,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.util.Callback;
 import org.lebastudios.theroundtable.controllers.PaneController;
 import org.lebastudios.theroundtable.database.Database;
+import org.lebastudios.theroundtable.locale.LocaleManager;
+import org.lebastudios.theroundtable.maths.BigDecimalOperations;
 import org.lebastudios.theroundtable.plugincashregister.cash.PaymentMethod;
 import org.lebastudios.theroundtable.plugincashregister.entities.Transaction;
 
@@ -13,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,18 +51,93 @@ public class MainPaneController extends PaneController<MainPaneController>
         employeeChoiceBox.getItems().addAll(employees);
 
         final var cols = tableView.getColumns();
-        ((TableColumn<TransactionTableItem, LocalDateTime>) cols.get(0)).setCellValueFactory(
-                cellData -> cellData.getValue().time);
+
+        TableColumn<TransactionTableItem, LocalDateTime> dateColumn =
+                (TableColumn<TransactionTableItem, LocalDateTime>) cols.get(0);
+        dateColumn.setCellValueFactory(cellData -> cellData.getValue().time);
+        dateColumn.setCellFactory(_ -> new TableCell<>()
+        {
+            private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (empty || item == null)
+                {
+                    setText(null);
+                }
+                else
+                {
+                    setText(item.format(formatter));
+                }
+            }
+        });
+
         ((TableColumn<TransactionTableItem, String>) cols.get(1)).setCellValueFactory(
                 cellData -> cellData.getValue().employee);
         ((TableColumn<TransactionTableItem, String>) cols.get(2)).setCellValueFactory(
                 cellData -> cellData.getValue().concept);
-        ((TableColumn<TransactionTableItem, PaymentMethod>) cols.get(3)).setCellValueFactory(
-                cellData -> cellData.getValue().method);
-        ((TableColumn<TransactionTableItem, BigDecimal>) cols.get(4)).setCellValueFactory(
-                cellData -> cellData.getValue().amount);
-        ((TableColumn<TransactionTableItem, BigDecimal>) cols.get(5)).setCellValueFactory(
-                cellData -> cellData.getValue().totalInCash);
+
+        final var methodColumn =
+                (TableColumn<TransactionTableItem, PaymentMethod>) cols.get(3);
+        methodColumn.setCellValueFactory(cellData -> cellData.getValue().method);
+        methodColumn.setCellFactory(_ -> new TableCell<>()
+        {
+            @Override
+            protected void updateItem(PaymentMethod item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (empty || item == null)
+                {
+                    setText(null);
+                }
+                else
+                {
+                    setText(item.translate());
+                }
+            }
+        });
+
+        Callback<TableColumn<TransactionTableItem, BigDecimal>,
+                TableCell<TransactionTableItem, BigDecimal>
+                > bigDecimalCell = new Callback<>()
+        {
+            @Override
+            public TableCell<TransactionTableItem, BigDecimal> call(
+                    TableColumn<TransactionTableItem, BigDecimal> param)
+            {
+                return new TableCell<>()
+                {
+                    @Override
+                    protected void updateItem(BigDecimal item, boolean empty)
+                    {
+                        super.updateItem(item, empty);
+                        if (empty || item == null)
+                        {
+                            setText(null);
+                            return;
+                        }
+
+                        if (item.compareTo(BigDecimal.ZERO) == 0)
+                        {
+                            setText("---- " + LocaleManager.getInstance().getActualCurrency().symbol());
+                            return;
+                        }
+
+                        setText(BigDecimalOperations.toCurrencyString(item));
+                    }
+                };
+            }
+        };
+
+        final var amountColumn = (TableColumn<TransactionTableItem, BigDecimal>) cols.get(4);
+        amountColumn.setCellValueFactory(cellData -> cellData.getValue().amount);
+        amountColumn.setCellFactory(bigDecimalCell);
+
+        final var totalColumn = (TableColumn<TransactionTableItem, BigDecimal>) cols.get(5);
+        totalColumn.setCellValueFactory(cellData -> cellData.getValue().totalInCash);
+        totalColumn.setCellFactory(bigDecimalCell);
 
         fromDatePicker.valueProperty().addListener((_, _, newVal) ->
         {
@@ -83,18 +162,18 @@ public class MainPaneController extends PaneController<MainPaneController>
                 toDatePicker.setValue(LocalDate.now());
                 return;
             }
-            
+
             if (newVal.isBefore(fromDatePicker.getValue()))
             {
                 fromDatePicker.setValue(newVal);
             }
-            
+
             search();
         });
-        
+
         cashRadioButton.selectedProperty().addListener(_ -> populate());
         creditRadioButton.selectedProperty().addListener(_ -> populate());
-        
+
         employeeChoiceBox.getSelectionModel().selectedItemProperty().addListener((_, _, newVal) ->
         {
             if (newVal == null)
