@@ -9,7 +9,6 @@ import org.lebastudios.theroundtable.controllers.PaneController;
 import org.lebastudios.theroundtable.database.Database;
 import org.lebastudios.theroundtable.locale.LocaleManager;
 import org.lebastudios.theroundtable.maths.BigDecimalOperations;
-import org.lebastudios.theroundtable.plugincashregister.cash.PaymentMethod;
 import org.lebastudios.theroundtable.plugincashregister.entities.Transaction;
 
 import java.math.BigDecimal;
@@ -80,12 +79,12 @@ public class MainPaneController extends PaneController<MainPaneController>
                 cellData -> cellData.getValue().concept);
 
         final var methodColumn =
-                (TableColumn<TransactionTableItem, PaymentMethod>) cols.get(3);
+                (TableColumn<TransactionTableItem, Transaction.PaymentMethod>) cols.get(3);
         methodColumn.setCellValueFactory(cellData -> cellData.getValue().method);
         methodColumn.setCellFactory(_ -> new TableCell<>()
         {
             @Override
-            protected void updateItem(PaymentMethod item, boolean empty)
+            protected void updateItem(Transaction.PaymentMethod item, boolean empty)
             {
                 super.updateItem(item, empty);
                 if (empty || item == null)
@@ -217,8 +216,8 @@ public class MainPaneController extends PaneController<MainPaneController>
         List<TransactionTableItem> items = foundItems.parallelStream()
                 .filter(item ->
                 {
-                    if (cashRadioButton.isSelected() && item.method.get() == PaymentMethod.CASH) return true;
-                    if (creditRadioButton.isSelected() && item.method.get() == PaymentMethod.CARD) return true;
+                    if (cashRadioButton.isSelected() && item.method.get() == Transaction.PaymentMethod.CASH) return true;
+                    if (creditRadioButton.isSelected() && item.method.get() == Transaction.PaymentMethod.CARD) return true;
 
                     if (employeeChoiceBox.getSelectionModel().isSelected(0)) return true;
                     if (employeeChoiceBox.getSelectionModel().getSelectedItem().equals(item.employee.get()))
@@ -235,13 +234,13 @@ public class MainPaneController extends PaneController<MainPaneController>
             SimpleObjectProperty<LocalDateTime> time,
             SimpleStringProperty employee,
             SimpleStringProperty concept,
-            SimpleObjectProperty<PaymentMethod> method,
+            SimpleObjectProperty<Transaction.PaymentMethod> method,
             SimpleObjectProperty<BigDecimal> amount,
             SimpleObjectProperty<BigDecimal> totalInCash
     )
     {
         public TransactionTableItem(
-                LocalDateTime time, String employee, String concept, PaymentMethod method,
+                LocalDateTime time, String employee, String concept, Transaction.PaymentMethod method,
                 BigDecimal amount, BigDecimal totalInCash
         )
         {
@@ -257,12 +256,11 @@ public class MainPaneController extends PaneController<MainPaneController>
         {
             this(
                     transaction.getDate(),
-                    transaction.getReceipt() == null ? "Unknown" : transaction.getReceipt().getAttendantName(),
+                    transaction.getReceipt() == null ? "Unknown" : transaction.getAccount().getName(),
                     transaction.getDescription(),
-                    transaction.getReceipt() == null ? PaymentMethod.CASH :
-                            PaymentMethod.valueOf(transaction.getReceipt().getPaymentMethod()),
+                    transaction.getReceipt() == null ? Transaction.PaymentMethod.CASH : transaction.getMethod(),
                     transaction.getAmount(),
-                    BigDecimal.ZERO
+                    transaction.getTotalCash()
             );
         }
     }
