@@ -3,8 +3,8 @@ package org.lebastudios.theroundtable.pluginaccounting;
 import org.lebastudios.theroundtable.MainStageController;
 import org.lebastudios.theroundtable.fxml2java.CompileFxml;
 import org.lebastudios.theroundtable.plugins.IPlugin;
-import org.lebastudios.theroundtable.ui.IconView;
-import org.lebastudios.theroundtable.ui.LabeledIconButton;
+import org.lebastudios.theroundtable.components.IconView;
+import org.lebastudios.theroundtable.components.LabeledIconButton;
 
 import java.util.List;
 
