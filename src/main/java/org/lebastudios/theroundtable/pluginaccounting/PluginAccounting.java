@@ -25,7 +25,7 @@ public class PluginAccounting implements IPlugin
     {
         LabeledIconButton button = new LabeledIconButton(
                 "Accounting",
-                "accounting.png",
+                "accounting:accounting.png",
                 _ ->
                 {
                     MainStageController.getInstance().setCentralNode(new MainPaneController());
