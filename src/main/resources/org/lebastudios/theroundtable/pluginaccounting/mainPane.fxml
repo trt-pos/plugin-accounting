@@ -4,16 +4,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.lebastudios.theroundtable.components.IconButton?>
+<?import org.lebastudios.theroundtable.components.DateRangePicker?>
 <VBox alignment="CENTER" spacing="5" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.lebastudios.theroundtable.pluginaccounting.MainPaneController">
     <padding>
         <Insets bottom="5" left="5" right="5" top="5"/>
     </padding>
     <HBox alignment="CENTER" spacing="15">
-        <Label text="From:"/>
-        <DatePicker fx:id="fromDatePicker"/>
-        <Label text="To:"/>
-        <DatePicker fx:id="toDatePicker"/>
+        <DateRangePicker fx:id="dateRangePicker" />
         <Region HBox.hgrow="ALWAYS"/>
         <IconButton iconName="menu.png"/>
     </HBox>
@@ -21,7 +19,8 @@
         <content>
             <VBox spacing="5">
                 <HBox spacing="5">
-                    <ChoiceBox fx:id="employeeChoiceBox"/>
+                    <Label text="Employee" />
+                    <ChoiceBox fx:id="employeeChoiceBox" prefWidth="250"/>
                 </HBox>
                 <HBox spacing="5">
                     <RadioButton fx:id="cashRadioButton" text="Cash" selected="true"/>
@@ -32,12 +31,12 @@
     </TitledPane>
     <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn text="Date"/>
-            <TableColumn text="Employee"/>
-            <TableColumn text="Concept"/>
-            <TableColumn text="Method"/>
-            <TableColumn text="Qty"/>
-            <TableColumn text="Total"/>
+            <TableColumn fx:id="dateColumn" text="Date"/>
+            <TableColumn fx:id="employeeColumn" text="Employee"/>
+            <TableColumn fx:id="conceptColumn" text="Concept"/>
+            <TableColumn fx:id="methodColumn" text="Method"/>
+            <TableColumn fx:id="qtyColumn" text="Qty"/>
+            <TableColumn fx:id="totalColumn" text="Total"/>
         </columns>
     </TableView>
     <HBox alignment="CENTER_RIGHT">

@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
+import org.lebastudios.theroundtable.components.DateRangePicker;
 import org.lebastudios.theroundtable.controllers.PaneController;
 import org.lebastudios.theroundtable.database.Database;
 import org.lebastudios.theroundtable.locale.LocaleManager;
@@ -21,12 +22,18 @@ import java.util.List;
 
 public class MainPaneController extends PaneController<MainPaneController>
 {
-    @FXML public DatePicker fromDatePicker;
-    @FXML public DatePicker toDatePicker;
+    @FXML public DateRangePicker dateRangePicker;
     @FXML public ChoiceBox<String> employeeChoiceBox;
     @FXML public RadioButton cashRadioButton;
     @FXML public RadioButton creditRadioButton;
+
     @FXML public TableView<TransactionTableItem> tableView;
+    @FXML public TableColumn<TransactionTableItem, LocalDateTime> dateColumn;
+    @FXML public TableColumn<TransactionTableItem, String> employeeColumn;
+    @FXML public TableColumn<TransactionTableItem, String> conceptColumn;
+    @FXML public TableColumn<TransactionTableItem, Transaction.PaymentMethod> methodColumn;
+    @FXML public TableColumn<TransactionTableItem, BigDecimal> qtyColumn;
+    @FXML public TableColumn<TransactionTableItem, BigDecimal> totalColumn;
 
     private List<TransactionTableItem> foundItems = new ArrayList<>();
 
@@ -34,9 +41,6 @@ public class MainPaneController extends PaneController<MainPaneController>
     protected void initialize()
     {
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-
-        fromDatePicker.setValue(LocalDate.now());
-        toDatePicker.setValue(LocalDate.now());
 
         List<String> employees = Database.getInstance().connectQuery(session ->
                 {
@@ -48,11 +52,8 @@ public class MainPaneController extends PaneController<MainPaneController>
         employeeChoiceBox.getItems().clear();
         employeeChoiceBox.getItems().add("All");
         employeeChoiceBox.getItems().addAll(employees);
+        employeeChoiceBox.getSelectionModel().select(0);
 
-        final var cols = tableView.getColumns();
-
-        TableColumn<TransactionTableItem, LocalDateTime> dateColumn =
-                (TableColumn<TransactionTableItem, LocalDateTime>) cols.get(0);
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().time);
         dateColumn.setCellFactory(_ -> new TableCell<>()
         {
@@ -73,13 +74,9 @@ public class MainPaneController extends PaneController<MainPaneController>
             }
         });
 
-        ((TableColumn<TransactionTableItem, String>) cols.get(1)).setCellValueFactory(
-                cellData -> cellData.getValue().employee);
-        ((TableColumn<TransactionTableItem, String>) cols.get(2)).setCellValueFactory(
-                cellData -> cellData.getValue().concept);
+        employeeColumn.setCellValueFactory(cellData -> cellData.getValue().employee);
+        conceptColumn.setCellValueFactory(cellData -> cellData.getValue().concept);
 
-        final var methodColumn =
-                (TableColumn<TransactionTableItem, Transaction.PaymentMethod>) cols.get(3);
         methodColumn.setCellValueFactory(cellData -> cellData.getValue().method);
         methodColumn.setCellFactory(_ -> new TableCell<>()
         {
@@ -130,46 +127,12 @@ public class MainPaneController extends PaneController<MainPaneController>
             }
         };
 
-        final var amountColumn = (TableColumn<TransactionTableItem, BigDecimal>) cols.get(4);
-        amountColumn.setCellValueFactory(cellData -> cellData.getValue().amount);
-        amountColumn.setCellFactory(bigDecimalCell);
+        qtyColumn.setCellValueFactory(cellData -> cellData.getValue().amount);
+        qtyColumn.setCellFactory(bigDecimalCell);
 
-        final var totalColumn = (TableColumn<TransactionTableItem, BigDecimal>) cols.get(5);
         totalColumn.setCellValueFactory(cellData -> cellData.getValue().totalInCash);
         totalColumn.setCellFactory(bigDecimalCell);
-
-        fromDatePicker.valueProperty().addListener((_, _, newVal) ->
-        {
-            if (newVal == null)
-            {
-                fromDatePicker.setValue(LocalDate.now());
-                return;
-            }
-
-            if (newVal.isAfter(toDatePicker.getValue()))
-            {
-                toDatePicker.setValue(newVal);
-            }
-
-            search();
-        });
-
-        toDatePicker.valueProperty().addListener((_, _, newVal) ->
-        {
-            if (newVal == null)
-            {
-                toDatePicker.setValue(LocalDate.now());
-                return;
-            }
-
-            if (newVal.isBefore(fromDatePicker.getValue()))
-            {
-                fromDatePicker.setValue(newVal);
-            }
-
-            search();
-        });
-
+        
         cashRadioButton.selectedProperty().addListener(_ -> populate());
         creditRadioButton.selectedProperty().addListener(_ -> populate());
 
@@ -184,14 +147,15 @@ public class MainPaneController extends PaneController<MainPaneController>
             populate();
         });
 
-        search();
+        dateRangePicker.setOnDateChange((from, to) -> search(from.atStartOfDay(), to.atTime(LocalTime.MAX)));
+        search(
+                dateRangePicker.getStartDate().getValue().atStartOfDay(),
+                dateRangePicker.getEndDate().getValue().atTime(LocalTime.MAX)
+        );
     }
 
-    private void search()
+    private void search(LocalDateTime from, LocalDateTime to)
     {
-        LocalDateTime from = fromDatePicker.getValue().atStartOfDay();
-        LocalDateTime to = toDatePicker.getValue().atTime(LocalTime.MAX);
-
         foundItems = Database.getInstance().connectQuery(session ->
         {
             return session.createQuery(
@@ -216,12 +180,17 @@ public class MainPaneController extends PaneController<MainPaneController>
         List<TransactionTableItem> items = foundItems.parallelStream()
                 .filter(item ->
                 {
-                    if (cashRadioButton.isSelected() && item.method.get() == Transaction.PaymentMethod.CASH) return true;
-                    if (creditRadioButton.isSelected() && item.method.get() == Transaction.PaymentMethod.CARD) return true;
+                    if (!(cashRadioButton.isSelected() && item.method.get() == Transaction.PaymentMethod.CASH
+                            || creditRadioButton.isSelected() && item.method.get() == Transaction.PaymentMethod.CARD))
+                    {
+                        return false;
+                    }
 
-                    if (employeeChoiceBox.getSelectionModel().isSelected(0)) return true;
-                    if (employeeChoiceBox.getSelectionModel().getSelectedItem().equals(item.employee.get()))
-                    {return true;}
+                    if (employeeChoiceBox.getSelectionModel().isSelected(0) 
+                            || employeeChoiceBox.getSelectionModel().getSelectedItem().equals(item.employee.get()))
+                    {
+                        return true;
+                    }
 
                     return false;
                 })
