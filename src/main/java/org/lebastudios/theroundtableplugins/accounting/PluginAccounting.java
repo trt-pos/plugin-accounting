@@ -1,16 +1,15 @@
-package org.lebastudios.theroundtable.pluginaccounting;
+package org.lebastudios.theroundtableplugins.accounting;
 
 import org.lebastudios.theroundtable.MainStageController;
 import org.lebastudios.theroundtable.fxml2java.CompileFxml;
 import org.lebastudios.theroundtable.plugins.IPlugin;
-import org.lebastudios.theroundtable.components.IconView;
 import org.lebastudios.theroundtable.components.LabeledIconButton;
 
 import java.util.List;
 
 @CompileFxml(
         directories = {
-                "org/lebastudios/theroundtable/pluginaccounting"
+                "org/lebastudios/theroundtableplugins/accounting"
         }
 )
 public class PluginAccounting implements IPlugin

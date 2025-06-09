@@ -1,4 +1,4 @@
-package org.lebastudios.theroundtable.pluginaccounting;
+package org.lebastudios.theroundtableplugins.accounting;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -10,10 +10,9 @@ import org.lebastudios.theroundtable.controllers.PaneController;
 import org.lebastudios.theroundtable.database.Database;
 import org.lebastudios.theroundtable.locale.LocaleManager;
 import org.lebastudios.theroundtable.maths.BigDecimalOperations;
-import org.lebastudios.theroundtable.plugincashregister.entities.Transaction;
+import org.lebastudios.theroundtableplugins.cr.entities.Transaction;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
