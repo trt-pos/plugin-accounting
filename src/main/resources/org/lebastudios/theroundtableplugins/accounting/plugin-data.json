@@ -5,6 +5,10 @@
   "pluginVersion": "3.0.0",
   "pluginVendor": "Leba Studios - Software Solutions",
   "pluginVendorUrl": "https://lebastudios.org",
+  "catregories": [
+    "general",
+    "accounting"
+  ],
   "pluginDependencies": [
     {
       "pluginId": "core",
