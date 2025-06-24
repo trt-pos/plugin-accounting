@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>org.lebastudios.theroundtable</groupId>
-            <artifactId>desktop-app</artifactId>
+            <artifactId>core</artifactId>
             <version>3.0.0</version>
             <scope>provided</scope>
         </dependency>
