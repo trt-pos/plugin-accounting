@@ -29,4 +29,13 @@
             <version>3.0.0</version>
         </dependency>
     </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.lebastudios.theroundtable</groupId>
+                <artifactId>t-cleaner</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
