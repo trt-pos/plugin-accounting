@@ -10,29 +10,99 @@
     <name>accounting</name>
     <packaging>jar</packaging>
 
-    <parent>
-        <groupId>com.github.trt-pos</groupId>
-        <artifactId>the-round-table</artifactId>
-        <version>dev-v3.0.0-SNAPSHOT</version>
-    </parent>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>22</java.version>
+        <maven.compiler.source>22</maven.compiler.source>
+        <maven.compiler.target>22</maven.compiler.target>
+        <junit.version>5.11.2</junit.version>
+    </properties>
+    
+    <prerequisites>
+        <maven>3.9.10</maven>
+    </prerequisites>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </pluginRepository>
+    </pluginRepositories>
     
     <dependencies>
         <dependency>
             <groupId>com.github.trt-pos</groupId>
             <artifactId>core</artifactId>
-            <version>dev-v3.0.0-SNAPSHOT</version>
+            <version>f33088d19f</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.trt-pos</groupId>
             <artifactId>plugin-cash-register</artifactId>
-            <version>dev-v3.0.0-SNAPSHOT</version>
+            <version>2d971b92ed</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.trt-pos</groupId>
+            <artifactId>fxml2java</artifactId>
+            <version>v0.5.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
     
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.34</version>
+                        </path>
+                        <path>
+                            <groupId>com.github.trt-pos</groupId>
+                            <artifactId>fxml2java</artifactId>
+                            <version>v0.5.0</version>
+                        </path>
+                        <path>
+                            <groupId>com.github.trt-pos</groupId>
+                            <artifactId>core</artifactId>
+                            <version>f33088d19f</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -45,6 +115,19 @@
             <plugin>
                 <groupId>com.github.trt-pos</groupId>
                 <artifactId>t-cleaner</artifactId>
+                <version>v0.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>clean-translations</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <pluginId>${project.artifactId}</pluginId>
+                    <sort>true</sort>
+                </configuration>
             </plugin>
         </plugins>
     </build>
